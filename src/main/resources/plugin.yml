@@ -1,0 +1,11 @@
+name: SuperLobby
+version: ${project.version}
+main: com.multocraft.superlobby.SuperLobby
+api-version: 1.16
+commands:
+   delspawn:
+      description: delete current spawn
+   spawn:
+      description: go to spawn
+   setspawn:
+      description: set a new spawn

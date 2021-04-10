@@ -1,0 +1,7 @@
+blacklist:
+   - '/?'
+   - '/help'
+   - '/server'
+   - '/op'
+   - '/plugins'
+   - '/pl'

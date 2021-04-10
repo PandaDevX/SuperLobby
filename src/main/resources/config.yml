@@ -1,0 +1,54 @@
+prefix: '&6&lMultoCraft &8>> &7'
+chat-cooldown: 2
+server-motd:
+  - '   &4Multo&fCraft &6&lNetwork &7[1.8-1.16]   \n   &a&l* STORE: test.store.com *  &250% discount'
+join:
+  motd:
+    - '&a>>  &bSet your own motd here'
+    - '&a>> &bThis is only example'
+    - '&a>> &bOnline: &c{online}'
+    - '&a>> &fHi &b{player} &fyour name is &b{displayname}'
+  title:
+    enable: true
+    title: '&6Title'
+    subTitle: '&7This is for subtitle'
+  gamemode: 'adventure'
+  headers:
+     - '&a&lM&f&lultocraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lM&a&lu&f&lltocraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMu&a&ll&f&ltocraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMul&a&lt&f&locraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMult&a&lo&f&lcraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMulto&a&lc&f&lraft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMultoc&a&lr&f&laft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMultocr&a&la&f&lft\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMultocra&a&lf&f&lt\n&7    Welcome to the Server &a{player}      \n'
+     - '&f&lMultocraf&a&lt\n&7    Welcome to the Server &a{player}      \n'
+  footers:
+     - '\n  &7Online Players: &a{online}  \n  &6&lStore: &bstore.test.com '
+  bossbar:
+     message: '&7Visit our store: &bstore.test.com'
+  firework:
+     spawn: true
+     amount: 2
+  scoreboard:
+     enable: true
+     title:
+        - '&6T&ditle'
+        - '&dT&6i&dtle'
+        - '&dTi&6t&dle'
+        - '&dTit&6l&de'
+        - '&dTitl&6e'
+     contents:
+        - '&6Online: &a{online}'
+        - '&6Real Name: &a{player}'
+        - '&6Name: &a{displayname}'
+
+lobby:
+  world: 'World'
+  time: 1000
+  pvp: true
+  maintenance: false
+  rain: true
+  spawnEntity: false
+
