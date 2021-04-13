@@ -1,7 +1,5 @@
 prefix: '&6&lMultoCraft &8>> &7'
 chat-cooldown: 2
-server-motd:
-  - '   &4Multo&fCraft &6&lNetwork &7[1.8-1.16]   \n   &a&l* STORE: test.store.com *  &250% discount'
 join:
   motd:
     - '&a>>  &bSet your own motd here'
@@ -28,6 +26,18 @@ join:
      - '\n  &7Online Players: &a{online}  \n  &6&lStore: &bstore.test.com '
   bossbar:
      message: '&7Visit our store: &bstore.test.com'
+  scoreboard:
+     title:
+        - '&a&lM&fultocraft'
+        - '&fM&a&lu&fltocraft'
+        - '&fMu&a&ll&ftocraft'
+        - '&fMul&a&lt&focraft'
+        - '&f&fMult&a&lo&fcraft'
+        - '&fMulto&a&lc&fraft'
+        - '&fMultoc&a&lr&faft'
+        - '&fMultocr&a&la&fft'
+        - '&fMultocra&a&lf&ft'
+        - '&fMultocraf&a&lt'
   firework:
      spawn: true
      amount: 2
@@ -52,3 +62,5 @@ lobby:
   rain: true
   spawnEntity: false
 
+whitelist:
+   - 'RedSpeaks'

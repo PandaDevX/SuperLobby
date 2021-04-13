@@ -3,8 +3,7 @@ package com.multocraft.superlobby.join;
 import com.multocraft.superlobby.SuperLobby;
 import com.multocraft.superlobby.chat.ChatUtil;
 import com.multocraft.superlobby.file.FileHandler;
-import com.multocraft.superlobby.player.MainThread;
-import com.multocraft.superlobby.player.TabHandler;
+import com.multocraft.superlobby.items.CustomItems;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -35,7 +34,7 @@ public class JoinHandler implements Runnable{
 
         setGod(e.getPlayer());
 
-        addToBossBar(e.getPlayer());
+        giveCustomItems(e.getPlayer());
 
         if(SuperLobby.getInstance().getConfig().getBoolean("join.firework.spawn")) {
             spawnFireworks(e.getPlayer(), SuperLobby.getInstance().getConfig().getInt("join.firework.amount"));
@@ -77,12 +76,6 @@ public class JoinHandler implements Runnable{
         }
     }
 
-    public void addToBossBar(Player player) {
-        if(MainThread.mainThreadMap.containsKey("server")) {
-            MainThread.mainThreadMap.get("server").addPlayer(player);
-        }
-    }
-
     public void spawnFireworks(Player player, int amount){
         Location loc = player.getLocation();
         Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
@@ -104,5 +97,9 @@ public class JoinHandler implements Runnable{
         loc = null;
         fw = null;
         fwm = null;
+    }
+
+    public void giveCustomItems(Player player) {
+        CustomItems.setup(player);
     }
 }

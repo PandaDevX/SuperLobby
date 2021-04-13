@@ -3,7 +3,6 @@ package com.multocraft.superlobby.join;
 import com.multocraft.superlobby.SuperLobby;
 import com.multocraft.superlobby.chat.ChatUtil;
 import com.multocraft.superlobby.player.MainThread;
-import com.multocraft.superlobby.player.TabHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,9 +19,6 @@ public class JoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        Bukkit.getScheduler().cancelTask(SuperLobby.id);
-        SuperLobby.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
-                new TabHandler(), 0, 5L);
         if(e.isAsynchronous()) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(SuperLobby.getInstance(),
                     new JoinHandler(e));
@@ -35,16 +31,14 @@ public class JoinListener implements Listener {
     public void onLogin(PlayerLoginEvent e) {
         if(!SuperLobby.getInstance().getConfig().getBoolean("lobby.maintenance")) return;
 
+        if(SuperLobby.getInstance().getConfig().getStringList("whitelist").contains(e.getPlayer().getName())) return;
+
         e.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatUtil.colorize("&c&lHey &fServer is under maintenance"));
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
-        if(SuperLobby.id == -1) return;
-        Bukkit.getScheduler().cancelTask(SuperLobby.id);
-        SuperLobby.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
-                new TabHandler(), 0, 5L);
         if(MainThread.mainThreadMap.containsKey("server")) {
             MainThread.mainThreadMap.get("server").removePlayer(e.getPlayer());
         }

@@ -9,3 +9,9 @@ commands:
       description: go to spawn
    setspawn:
       description: set a new spawn
+   maintenance:
+      description: enable or disable maintenance mode
+   serverteleport:
+      description: teleport to server location
+   setserver:
+      description: set server teleport location

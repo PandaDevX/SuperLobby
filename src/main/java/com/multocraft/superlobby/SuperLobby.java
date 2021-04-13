@@ -1,22 +1,17 @@
 package com.multocraft.superlobby;
 
 import com.multocraft.superlobby.chat.ChatListener;
-import com.multocraft.superlobby.command.DelSpawnCommand;
-import com.multocraft.superlobby.command.SetSpawn;
-import com.multocraft.superlobby.command.SpawnCommand;
+import com.multocraft.superlobby.command.*;
 import com.multocraft.superlobby.file.FileHandler;
+import com.multocraft.superlobby.items.ServerSelector;
 import com.multocraft.superlobby.join.JoinListener;
-import com.multocraft.superlobby.join.ListMotdListener;
 import com.multocraft.superlobby.player.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SuperLobby extends JavaPlugin {
-
-    public static int id = -1;
 
     public static SuperLobby instance;
 
@@ -34,18 +29,21 @@ public final class SuperLobby extends JavaPlugin {
 
         new JoinListener(this);
         new ChatListener(this);
-        new ListMotdListener(this);
-        new BreakListener(this);
+        new PlayerListener(this);
         new PVPListener(this);
 
         new DelSpawnCommand(this);
         new SetSpawn(this);
         new SpawnCommand(this);
+        new ServerTeleportCommand(this);
+        new SetServerCommand(this);
+        new MaintenanceCommand(this);
 
-        this.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ScoreboardHandler(), 0, 5);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
                 new TabHandler(), 0, 5L);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new TimeSetter(), 0, 100L);
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BossBarBroadcastHandler(), 0, 1);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new BossBarBroadcastHandler(), 0, 5);
 
         if(!getConfig().getBoolean("lobby.spawnEntity")) {
             for (Entity livingEntity : Bukkit.getWorld(getConfig().getString("lobby.world")).getEntities()) {
@@ -55,6 +53,11 @@ public final class SuperLobby extends JavaPlugin {
                 livingEntity.remove();
             }
         }
+
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord",  new ServerSelector());
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new TabHandler());
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new ScoreboardHandler());
     }
 
     @Override

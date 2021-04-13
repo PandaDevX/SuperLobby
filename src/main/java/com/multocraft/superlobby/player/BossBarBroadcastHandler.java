@@ -13,8 +13,6 @@ import java.util.Collection;
 
 public class BossBarBroadcastHandler implements Runnable {
 
-    private int index = 0;
-
     @Override
     public void run() {
         if(MainThread.mainThreadMap.containsKey("server")) {
@@ -48,14 +46,12 @@ public class BossBarBroadcastHandler implements Runnable {
                     }
                 }
                 MainThread.mainThreadMap2.put("server", bar);
-                index++;
                 bar = null;
             }catch (NoSuchMethodError e) {
                 BossBar bar = BossBarAPI.addBar((Collection<Player>) Bukkit.getOnlinePlayers(), new TextComponent(TextComponent.fromLegacyText(FileHandler.getConfigContent("join.bossbar.message"))),
                         BossBarAPI.Color.PURPLE,
                         BossBarAPI.Style.NOTCHED_10,1.0f);
                 MainThread.mainThreadMap.put("server", bar);
-                index++;
                 bar = null;
             }
         }

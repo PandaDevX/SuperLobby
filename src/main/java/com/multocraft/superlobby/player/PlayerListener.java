@@ -3,6 +3,8 @@ package com.multocraft.superlobby.player;
 import com.multocraft.superlobby.SuperLobby;
 import com.multocraft.superlobby.chat.ChatUtil;
 import com.multocraft.superlobby.file.FileHandler;
+import com.multocraft.superlobby.items.ServerSelector;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -20,11 +22,12 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BreakListener implements Listener {
+public class PlayerListener implements Listener {
 
+    Set<String> hiding = new HashSet<>();
     Set<String> shooters = new HashSet<>();
 
-    public BreakListener(Plugin plugin) {
+    public PlayerListener(Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     boolean maintenance = SuperLobby.getInstance().getConfig().getBoolean("lobby.maintenance");
@@ -53,23 +56,74 @@ public class BreakListener implements Listener {
             return;
         }
         if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if(e.getItem() != null && e.getItem().hasItemMeta() && ChatUtil.strip(e.getItem().getItemMeta().getDisplayName()).equals("Teleport Bow")) {
-                shooters.add(e.getPlayer().getUniqueId().toString());
+            if(e.getItem() != null && e.getItem().hasItemMeta()) {
+                switch (ChatUtil.strip(e.getItem().getItemMeta().getDisplayName())) {
+                    case "Teleport Bow":
+                        shooters.add(e.getPlayer().getUniqueId().toString());
+                        break;
+                    case "Player Hider":
+                        for(Player player : Bukkit.getOnlinePlayers()) {
+                            if(!hiding.contains(e.getPlayer().getUniqueId().toString())) {
+                                hiding.add(e.getPlayer().getUniqueId().toString());
+                                e.getPlayer().hidePlayer(SuperLobby.getInstance(), player);
+                                return;
+                            }
+                            hiding.remove(e.getPlayer().getUniqueId().toString());
+                            e.getPlayer().showPlayer(SuperLobby.getInstance(), player);
+                        }
+                        break;
+                    case "Server Selector":
+                        ServerSelector serverSelector = new ServerSelector();
+                        serverSelector.setup();
+                        serverSelector.openInventory(e.getPlayer());
+                        serverSelector = null;
+                        break;
+                    default:
+                        break;
+                }
+                e.setCancelled(true);
             }
+            return;
         }
         e.setCancelled(true);
     }
 
     @EventHandler
-    public void onShoot(ProjectileHitEvent e) {
-        if(e.getEntity() instanceof Arrow) {
-            Player player = (Player) e.getEntity();
+    public void enterPortal(PlayerPortalEvent e) {
+        e.setCancelled(true);
+        ServerSelector serverSelector = new ServerSelector();
+        serverSelector.setup();
+        serverSelector.openInventory(e.getPlayer());
+        serverSelector = null;
+    }
 
-            if(shooters.contains(player.getUniqueId().toString())) {
-                player.teleport(e.getEntity().getLocation());
-                player.playSound(player.getLocation(), getSound("enderman scream"), 2.0f, 1.0f);
-                shooters.remove(player.getUniqueId().toString());
-            }
+    @EventHandler
+    public void onShoot(ProjectileHitEvent e) {
+        if(e.isAsynchronous()) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(SuperLobby.getInstance(),
+                    () -> {
+                        if(e.getEntity() instanceof Arrow) {
+                            Player player = (Player) e.getEntity();
+
+                            if(shooters.contains(player.getUniqueId().toString())) {
+                                player.teleport(e.getEntity().getLocation());
+                                player.playSound(player.getLocation(), getSound("enderman scream"), 2.0f, 1.0f);
+                                shooters.remove(player.getUniqueId().toString());
+                            }
+                        }
+                    });
+        } else {
+            ((Runnable) () -> {
+                if (e.getEntity() instanceof Arrow) {
+                    Player player = (Player) e.getEntity();
+
+                    if (shooters.contains(player.getUniqueId().toString())) {
+                        player.teleport(e.getEntity().getLocation());
+                        player.playSound(player.getLocation(), getSound("enderman scream"), 2.0f, 1.0f);
+                        shooters.remove(player.getUniqueId().toString());
+                    }
+                }
+            }).run();
         }
     }
 
@@ -108,9 +162,16 @@ public class BreakListener implements Listener {
         e.setCancelled(true);
     }
 
+
     @EventHandler
-    public void onDropItem(PlayerDropItemEvent e) {
-        if(maintenance)return;
+    public void onDropItem(EntityDropItemEvent e) {
+        if(maintenance) return;
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent e) {
+        if(e.getPlayer().hasPermission("sl.command")) return;
         e.setCancelled(true);
     }
 

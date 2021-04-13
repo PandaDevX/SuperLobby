@@ -54,6 +54,38 @@ public class FileHandler {
         fileUtil = null;
     }
 
+    public static void saveLocation(Player player, String path) {
+        Location location = player.getLocation();
+        FileUtil fileUtil = new FileUtil(SuperLobby.getInstance(), "spawn.yml", false);
+        fileUtil.get().set(path + ".world", location.getWorld().getName());
+        fileUtil.get().set(path + ".x", location.getX());
+        fileUtil.get().set(path + ".y", location.getY());
+        fileUtil.get().set(path + ".z", location.getZ());
+        fileUtil.get().set(path + ".yaw", location.getYaw());
+        fileUtil.get().set(path + ".pitch", location.getPitch());
+        fileUtil.save();
+        location = null;
+        fileUtil = null;
+    }
+
+    public static Location getLocation(String path) {
+        try {
+            FileConfiguration config = getConfig("spawn.yml", false);
+            Float yaw = (float) config.getDouble(path + ".yaw");
+            Float pitch = (float) config.getDouble(path + ".pitch");
+            Location location = new Location(Bukkit.getWorld(config.getString("spawn.world")),
+                    config.getDouble(path + ".x"),
+                    config.getDouble(path + ".y"),
+                    config.getDouble(path + ".z"),
+                    yaw,
+                    pitch);
+            config = null;
+            return location;
+        }catch (NullPointerException e) {
+            return Bukkit.getWorld(SuperLobby.getInstance().getConfig().getString("lobby.world")).getSpawnLocation();
+        }
+    }
+
     public static void deleteLocation() {
         FileUtil fileUtil = new FileUtil(SuperLobby.getInstance(), "spawn.yml", false);
         fileUtil.get().set("spawn", null);
