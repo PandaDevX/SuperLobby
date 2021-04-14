@@ -3,6 +3,7 @@ package com.multocraft.superlobby.chat;
 import com.multocraft.superlobby.SuperLobby;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
@@ -30,6 +31,10 @@ public class ChatUtil {
 
     public static void sendPlayerMessage(Player player, String message) {
         player.sendMessage(colorize(SuperLobby.getInstance().getConfig().getString("prefix") + message));
+    }
+
+    public static void sendPlayerMessage(CommandSender sender, String message) {
+        sender.sendMessage(colorize(SuperLobby.getInstance().getConfig().getString("prefix") + message));
     }
 
     public static boolean sensorAd(String message) {

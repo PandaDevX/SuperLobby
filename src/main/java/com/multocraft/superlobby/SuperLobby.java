@@ -5,6 +5,8 @@ import com.multocraft.superlobby.command.*;
 import com.multocraft.superlobby.file.FileHandler;
 import com.multocraft.superlobby.items.ServerSelector;
 import com.multocraft.superlobby.join.JoinListener;
+import com.multocraft.superlobby.npc.NPCCommand;
+import com.multocraft.superlobby.npc.NPCFile;
 import com.multocraft.superlobby.player.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -26,6 +28,7 @@ public final class SuperLobby extends JavaPlugin {
         FileHandler.saveDefaultFile(this, "words.yml");
         FileHandler.saveFile(this, "spawn.yml");
         FileHandler.saveDefaultFile(this, "commands.yml");
+        FileHandler.saveFile(this, "npc.yml");
 
         new JoinListener(this);
         new ChatListener(this);
@@ -38,6 +41,9 @@ public final class SuperLobby extends JavaPlugin {
         new ServerTeleportCommand(this);
         new SetServerCommand(this);
         new MaintenanceCommand(this);
+        new NPCCommand(this);
+
+        NPCFile.spawnNPCS();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ScoreboardHandler(), 0, 5);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
