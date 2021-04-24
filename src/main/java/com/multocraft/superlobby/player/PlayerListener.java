@@ -5,9 +5,14 @@ import com.multocraft.superlobby.chat.ChatUtil;
 import com.multocraft.superlobby.file.FileHandler;
 import com.multocraft.superlobby.items.ServerSelector;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,6 +22,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 import java.util.HashSet;
@@ -48,9 +54,11 @@ public class PlayerListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         if(maintenance) return;
         if(e.getAction() == Action.PHYSICAL) {
-            if(e.getClickedBlock().getType().name().endsWith("PRESSURE_PLATE")) {
+            if(e.getClickedBlock() == null) return;
+            if(e.getClickedBlock().getType() == Material.LIGHT_WEIGHTED_PRESSURE_PLATE) {
                 e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().clone().multiply(5).setY(2));
                 e.getPlayer().setVelocity(new Vector(e.getPlayer().getVelocity().clone().getX(), 1.0D, e.getPlayer().getVelocity().clone().getZ()));
+                e.setCancelled(true);
                 return;
             }
             return;
@@ -60,6 +68,8 @@ public class PlayerListener implements Listener {
                 switch (ChatUtil.strip(e.getItem().getItemMeta().getDisplayName())) {
                     case "Teleport Bow":
                         shooters.add(e.getPlayer().getUniqueId().toString());
+                        e.getPlayer().getInventory().setItem(9, new ItemStack(Material.ARROW));
+                        e.getPlayer().updateInventory();
                         break;
                     case "Player Hider":
                         for(Player player : Bukkit.getOnlinePlayers()) {
@@ -71,21 +81,26 @@ public class PlayerListener implements Listener {
                             hiding.remove(e.getPlayer().getUniqueId().toString());
                             e.getPlayer().showPlayer(SuperLobby.getInstance(), player);
                         }
+                        e.setCancelled(true);
                         break;
                     case "Server Selector":
                         ServerSelector serverSelector = new ServerSelector();
                         serverSelector.setup();
                         serverSelector.openInventory(e.getPlayer());
+
+                        e.setCancelled(true);
                         serverSelector = null;
                         break;
                     default:
                         break;
                 }
-                e.setCancelled(true);
             }
             return;
         }
-        e.setCancelled(true);
+        if(e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_AIR) {
+            e.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler
@@ -103,24 +118,32 @@ public class PlayerListener implements Listener {
             Bukkit.getScheduler().scheduleSyncDelayedTask(SuperLobby.getInstance(),
                     () -> {
                         if(e.getEntity() instanceof Arrow) {
-                            Player player = (Player) e.getEntity();
+                            Projectile projectile = e.getEntity();
+                            Player player = (Player) projectile.getShooter();
 
                             if(shooters.contains(player.getUniqueId().toString())) {
                                 player.teleport(e.getEntity().getLocation());
                                 player.playSound(player.getLocation(), getSound("enderman scream"), 2.0f, 1.0f);
                                 shooters.remove(player.getUniqueId().toString());
+                                player.getInventory().setItem(9, null);
+                                player.updateInventory();
+                                e.getEntity().remove();
                             }
                         }
                     });
         } else {
             ((Runnable) () -> {
                 if (e.getEntity() instanceof Arrow) {
-                    Player player = (Player) e.getEntity();
+                    Projectile projectile = e.getEntity();
+                    Player player = (Player) projectile.getShooter();
 
                     if (shooters.contains(player.getUniqueId().toString())) {
                         player.teleport(e.getEntity().getLocation());
                         player.playSound(player.getLocation(), getSound("enderman scream"), 2.0f, 1.0f);
                         shooters.remove(player.getUniqueId().toString());
+                        player.getInventory().setItem(9, null);
+                        player.updateInventory();
+                        e.getEntity().remove();
                     }
                 }
             }).run();
@@ -136,7 +159,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onDamage(PlayerItemDamageEvent e) {
         if(maintenance) return;
-        e.setCancelled(true);
+        e.setDamage(0);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -150,14 +173,21 @@ public class PlayerListener implements Listener {
         e.getWorld().setThundering(false);
     }
 
+
     @EventHandler
     public void onChangeFood(FoodLevelChangeEvent e) {
+        if(maintenance)return;
+        e.setFoodLevel(20);
+    }
+
+    @EventHandler
+    public void onBurnBlock(BlockBurnEvent e) {
         if(maintenance)return;
         e.setCancelled(true);
     }
 
     @EventHandler
-    public void onBurnBlock(BlockBurnEvent e) {
+    public void onIgnite(BlockIgniteEvent e) {
         if(maintenance)return;
         e.setCancelled(true);
     }
@@ -167,6 +197,23 @@ public class PlayerListener implements Listener {
     public void onDropItem(EntityDropItemEvent e) {
         if(maintenance) return;
         e.setCancelled(true);
+    }
+
+
+    @EventHandler
+    public void onJump(PlayerToggleFlightEvent e) {
+        Player player = e.getPlayer();
+        if(player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
+        e.setCancelled(true);
+        Block block = player.getWorld().getBlockAt(player.getLocation().clone().subtract(0, 2, 0));
+        if(block.getType() == Material.AIR)
+            return;
+        Vector v = player.getLocation().getDirection().clone().multiply(1).setY(1);
+        player.setVelocity(v);
+
+        player = null;
+        block = null;
+        v = null;
     }
 
     @EventHandler
@@ -222,6 +269,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onEntityDamage (EntityDamageEvent e) {
+        if(SuperLobby.getInstance().getConfig().getBoolean("lobby.pvp")) return;
         if(maintenance)return;
         if (e.getEntity() instanceof Player) {
             //If the entity is a player
@@ -229,7 +277,6 @@ public class PlayerListener implements Listener {
             //Create a new variable for the player
             if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 //If the cause of the event is the void
-                e.setCancelled(true);
                 FileHandler.teleportToSpawn(player);
                 player = null;
             }
@@ -240,6 +287,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent e) {
+        if(e.getEntity() instanceof Arrow) return;
+        if(e.getEntity() instanceof ArmorStand) return;
         if(maintenance)return;
         if(SuperLobby.getInstance().getConfig().getBoolean("lobby.spawnEntity")) return;
         e.setCancelled(true);

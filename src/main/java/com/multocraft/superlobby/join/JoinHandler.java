@@ -62,6 +62,7 @@ public class JoinHandler implements Runnable{
 
     public void setGameMode(Player player) {
         player.setGameMode(GameMode.valueOf(FileHandler.getConfigContent("join.gamemode").replace(" ", "_").toUpperCase()));
+        player.setAllowFlight(true);
     }
 
     public void setGod(Player player) {

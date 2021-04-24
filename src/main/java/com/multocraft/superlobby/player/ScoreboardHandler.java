@@ -19,45 +19,48 @@ import java.util.List;
 public class ScoreboardHandler implements Runnable, PluginMessageListener {
     private int index = 0;
     private HashMap<String, Integer> playersCount = new HashMap<>();
+    private final Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 
     @Override
     public void run() {
+
         getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
         if(index >= animatedName().size())
             index = 0;
         getObjective().setDisplayName(animatedName().get(index));
-        Score score = getObjective().getScore("&6____,[ &2List of Servers &6],____");
+        Score score = getObjective().getScore(ChatUtil.colorize("&6____,[ &2List of Servers &6],____"));
         score.setScore(8);
         sendInfo("lobby");
-        Score score1 = getObjective().getScore("&bLobby");
+        Score score1 = getObjective().getScore(ChatUtil.colorize("&bLobby"));
         score1.setScore(7);
-        Score score2 = getObjective().getScore("&7Online Players: &c" + playersCount.get("lobby"));
+        Score score2 = getObjective().getScore(ChatUtil.colorize("&7Online Players: &c" + playersCount.get("lobby")));
         score2.setScore(6);
         sendInfo("prison");
-        Score score3 = getObjective().getScore("&bPrison");
+        Score score3 = getObjective().getScore(ChatUtil.colorize("&bPrison"));
         score3.setScore(5);
-        Score score4 = getObjective().getScore("&7Online Players: &c" + playersCount.get("prison"));
+        Score score4 = getObjective().getScore(ChatUtil.colorize("&7Online Players: &c" + playersCount.get("prison")));
         score4.setScore(4);
         sendInfo("skyblock");
-        Score score5 = getObjective().getScore("&bSky Block");
+        Score score5 = getObjective().getScore(ChatUtil.colorize("&bSky Block"));
         score5.setScore(3);
-        Score score6 = getObjective().getScore("&7Online Players: &c" + playersCount.get("skyblock"));
+        Score score6 = getObjective().getScore(ChatUtil.colorize("&7Online Players: &c" + playersCount.get("skyblock")));
         score6.setScore(2);
+        Score score7 = getObjective().getScore("");
+        score7.setScore(1);
         if(!Bukkit.getOnlinePlayers().isEmpty()) {
             for(Player player : Bukkit.getOnlinePlayers()) {
-                Score score7 = getObjective().getScore("");
-                score7.setScore(1);
-                Score score8 = getObjective().getScore("&6Welcome to the server &2" + player.getName());
+                Score score8 = getObjective().getScore(ChatUtil.colorize("&6Welcome to the server &2" + player.getName()));
                 score8.setScore(0);
 
-                score7 = null;
                 score8 = null;
 
                 player.setScoreboard(getScoreBoard());
             }
         }
+        index++;
 
 
+        score7 = null;
         score = null;
         score1 = null;
         score2 = null;
@@ -68,10 +71,13 @@ public class ScoreboardHandler implements Runnable, PluginMessageListener {
     }
 
     private Scoreboard getScoreBoard() {
-        return Bukkit.getScoreboardManager().getMainScoreboard();
+        return this.scoreboard;
     }
 
     private Objective getObjective() {
+        if(getScoreBoard().getObjective("test") != null) {
+            return getScoreBoard().getObjective("test");
+        }
         return getScoreBoard().registerNewObjective("test", "dummy");
     }
 

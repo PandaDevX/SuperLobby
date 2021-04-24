@@ -6,7 +6,7 @@ import com.multocraft.superlobby.file.FileHandler;
 import com.multocraft.superlobby.items.ServerSelector;
 import com.multocraft.superlobby.join.JoinListener;
 import com.multocraft.superlobby.npc.NPCCommand;
-import com.multocraft.superlobby.npc.NPCFile;
+import com.multocraft.superlobby.npcapi.NPCManager;
 import com.multocraft.superlobby.player.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SuperLobby extends JavaPlugin {
+
+    private NPCManager npcManager;
 
     public static SuperLobby instance;
 
@@ -33,7 +35,6 @@ public final class SuperLobby extends JavaPlugin {
         new JoinListener(this);
         new ChatListener(this);
         new PlayerListener(this);
-        new PVPListener(this);
 
         new DelSpawnCommand(this);
         new SetSpawn(this);
@@ -42,8 +43,6 @@ public final class SuperLobby extends JavaPlugin {
         new SetServerCommand(this);
         new MaintenanceCommand(this);
         new NPCCommand(this);
-
-        NPCFile.spawnNPCS();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ScoreboardHandler(), 0, 5);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(SuperLobby.getInstance(),
@@ -64,6 +63,8 @@ public final class SuperLobby extends JavaPlugin {
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord",  new ServerSelector());
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new TabHandler());
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new ScoreboardHandler());
+
+        npcManager = new NPCManager(this, false);
     }
 
     @Override
@@ -79,9 +80,15 @@ public final class SuperLobby extends JavaPlugin {
         }
         MainThread.mainThreadMap2.clear();
         MainThread.mainThreadMap.clear();
+
+        getNpcManager().deleteAllNPCs();
     }
 
     public static SuperLobby getInstance() {
         return instance;
+    }
+
+    public NPCManager getNpcManager() {
+        return npcManager;
     }
 }

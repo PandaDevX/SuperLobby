@@ -2,6 +2,7 @@ name: SuperLobby
 version: ${project.version}
 main: com.multocraft.superlobby.SuperLobby
 api-version: 1.16
+depend: [ProtocolLib]
 commands:
    delspawn:
       description: delete current spawn

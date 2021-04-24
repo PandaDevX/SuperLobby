@@ -70,7 +70,7 @@ public class ServerSelector implements PluginMessageListener, Listener {
                 .map(Material::name)
                 .collect(Collectors.toList())
                 .contains("ENDER_EYE");
-        return Material.matchMaterial(isNewVersion ? "EYE_OF_ENDER" : "ENDER_EYE");
+        return Material.matchMaterial(isNewVersion ? "ENDER_EYE" : "EYE_OF_ENDER");
     }
 
     public Material getIronBars() {

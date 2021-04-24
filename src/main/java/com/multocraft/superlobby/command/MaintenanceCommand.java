@@ -12,6 +12,7 @@ public class MaintenanceCommand implements CommandExecutor {
 
     public MaintenanceCommand(SuperLobby plugin) {
         this.plugin = plugin;
+        plugin.getCommand("maintenance").setExecutor(this);
     }
 
     @Override

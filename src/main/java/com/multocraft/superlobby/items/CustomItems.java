@@ -3,7 +3,9 @@ package com.multocraft.superlobby.items;
 import com.multocraft.superlobby.chat.ChatUtil;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -22,6 +24,8 @@ public class CustomItems {
         ItemBuilder teleportBow = new ItemBuilder(Material.BOW);
 
         teleportBow.setName("&6&lT&feleport &6&lB&fow");
+        teleportBow.setEnchantment(Enchantment.ARROW_INFINITE, 1);
+        teleportBow.setFlag(ItemFlag.HIDE_ENCHANTS);
 
         ItemBuilder playersHider = new ItemBuilder(getSkull(player, "&6&lP&flayer &6&lH&fider"));
 
